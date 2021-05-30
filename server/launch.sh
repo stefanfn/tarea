@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONTAINER_NAME="$(basename $(pwd))"
+CONTAINER_NAME="tarea"
 
 PORT=42956 # H A Z L O
 
