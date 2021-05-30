@@ -1,0 +1,21 @@
+<style>
+</style>
+
+<div class="content" role="main">
+
+  <span *ngIf="loadedAufgaben.length === 0">Nichts zu tun. Saubere Arbeit.<br/></span>
+  <label for="allTasks">Alle Aufgaben anzeigen</label>
+  <input id="allTasks" type="checkbox" (change)="onChangeAllTasks()">
+  <br/>
+  <span *ngIf="loadedAufgaben.length > 0">
+    <app-aufgaben [aufgaben]="loadedAufgaben" (select)="onAufgabeSelect($event)"></app-aufgaben>
+    <span *ngIf="selection">
+      Fällig am {{selection && selection.due}} und dann alle {{selection && selection.lasts || '-'}} Tage.
+    </span>
+    <br/>
+    <button type="button" (click)="onClickDone()">Machma</button>
+    <br/>
+  </span>
+  <button type="button" (click)="onClickCreate()">Neue Aufgabe</button>
+
+</div>
