@@ -1,6 +1,6 @@
 #!/usr/bin/node
 
-const sqlite3 = require('sqlite3');
+const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 const httpcoolmule = require('./httpcoolmule');
 const tableName = 'task';
@@ -17,6 +17,7 @@ function createTask() {
 }
 
 function get(all) {
+    console.log('get', all);
     return prepareDatabase().then(queryTasks.bind(this, all));
 }
 
@@ -25,15 +26,16 @@ function getCreate(parameters) {
 }
 
 function prepareDatabase() {
-    return prepareDatabasePromise = prepareDatabasePromise || database.exec(
-        'CREATE TABLE IF NOT EXISTS ' + tableName +
-        ' (' +
-            'task_id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
-            'text text NOT NULL, ' +
-            'lasts int NOT NULL, ' +
-            'done_on date' +
-        ')'
-    );
+    console.log('prepareDatabase', prepareDatabasePromise);
+    return prepareDatabasePromise = prepareDatabasePromise || database.exec(`
+        CREATE TABLE IF NOT EXISTS ${tableName}
+        (
+            task_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            text text NOT NULL,
+            lasts int NOT NULL,
+            done_on date
+        )
+    `);
 }
 
 function put(data) {
@@ -45,12 +47,12 @@ function put(data) {
 }
 
 function queryTasks(all) {
+    console.log('queryTasks');
     return database.all(`
         SELECT task_id, text, date(coalesce(done_on, '1970-01-01'), lasts || ' days') AS due, lasts
-        FROM ${tableName}` +
-        all ? '' : `
-        WHERE due <= date('now', '+7 days')
-    `);
+        FROM ${tableName}
+    ` + (all ? '' : `WHERE due <= date('now', '+7 days')`)
+    );
 }
 
 function markTaskDone(taskId) {
@@ -59,7 +61,7 @@ function markTaskDone(taskId) {
 }
 
 open({
-    filename: './tarea.db',
+    filename: '/app/tarea.db',
     driver: sqlite3.Database
 }).then((db) => {
     database = db;
