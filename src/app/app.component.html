@@ -1,20 +1,61 @@
 <style>
+  .content .text {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .content .editor .label {
+    width: 4em;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .content .editor .tasktext {
+    width: 30em;
+    vertical-align: middle;
+  }
+  .content .editor .taskdate {
+    width: 10em;
+    vertical-align: middle;
+  }
+  .content .editor .tasklasts {
+    width: 3em;
+    vertical-align: middle;
+  }
 </style>
 
 <div class="content" role="main">
-
-  <span *ngIf="loadedAufgaben.length === 0">Nichts zu tun. Saubere Arbeit.<br/></span>
+  <span *ngIf="loadedAufgaben.length === 0" class="text">Nichts zu tun. Saubere Arbeit.<br/></span>
   <label for="allTasks">Alle Aufgaben anzeigen</label>
   <input id="allTasks" type="checkbox" (change)="onChangeAllTasks()">
   <br/>
   <span *ngIf="loadedAufgaben.length > 0">
-    <app-aufgaben [aufgaben]="loadedAufgaben" (select)="onAufgabeSelect($event)"></app-aufgaben>
-    <span *ngIf="selection">
-      Fällig am {{selection && selection.due}} und dann alle {{selection && selection.lasts || '-'}} Tage.
+    <app-aufgaben [aufgaben]="loadedAufgaben" (select)="onAufgabeSelect($event)"></app-aufgaben>&nbsp;
+    <span *ngIf="!editMode">
+      <span *ngIf="selection" class="text">
+        Fällig am {{selection && selection.due}} und dann alle {{selection && selection.lasts || '-'}} Tage.
+      </span>
+      <br/>
+      <button type="button" (click)="onClickEdit()">Bearbeiten</button>
+    </span><br/>
+    <span class="editor" *ngIf="editMode">
+      <span *ngIf="selection">
+        <span class="label">Aufgabe</span>
+        <input class="tasktext" type="text" [value]="selection.text" (change)="onChangeText($event.target)"><br/>
+        <span class="label">Fälligkeit</span>
+        <input class="taskdate" type="date" [value]="selection.due" (change)="onChangeDue($event.target)"><br/>
+        <span class="label">Intervall</span>
+        <input
+          class="tasklasts"
+          type="number"
+          [value]="selection.lasts"
+          (change)="onChangeLasts($event.target)"
+        >
+        <span class="label">&nbsp;Tage.</span>
+      </span>
+      <br/>
+      <button type="button" (click)="onClickSave()">Speichern</button>
+      <button type="button" (click)="onClickCancel()">Abbrechen</button><br/>
     </span>
-    <br/>
-    <button type="button" (click)="onClickDone()">Machma</button>
-    <br/>
+    <button type="button" (click)="onClickDone()">Erledigt</button><br/>
   </span>
   <button type="button" (click)="onClickCreate()">Neue Aufgabe</button>
 

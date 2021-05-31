@@ -81,7 +81,7 @@ function start(config) {
                 request.on(
                     'end',
                     () => {
-                        config[method](postEvent)
+                        config[functionName](postEvent.postData)
                             .then((result) => {
                                 console.log('result', result);
                                 responder({content: JSON.stringify(result)});

@@ -13,12 +13,15 @@ export class AppComponent {
 
   readonly URL_BASE = 'http://localhost:42956/';
   readonly URL_CREATE = this.URL_BASE + 'create';
+  readonly URL_UPDATE = this.URL_BASE + 'update';
 
   loadedAufgaben: Array<task> = [];
 
   selection: task | null = null;
 
   allTasks: boolean = false;
+
+  editMode: boolean = false;
 
   constructor(private http: HttpClient) {}
 
@@ -43,6 +46,31 @@ export class AppComponent {
       .subscribe(this.deploy.bind(this));
   }
 
+  onChangeDue(target: any): void {
+    if (!this.selection || !target.value) {
+      return;
+    }
+    this.selection.due = target.value;
+  }
+
+  onChangeLasts(target: any): void {
+    if (!this.selection || !target.value) {
+      return;
+    }
+    this.selection.lasts = parseInt(target.value);
+  }
+
+  onChangeText(target: any): void {
+    if (!this.selection || !target.value) {
+      return;
+    }
+    this.selection.text = target.value;
+  }
+
+  onClickCancel(): void {
+    this.editMode = false;
+  }
+
   onClickCreate(): void {
     this.http.get(this.URL_CREATE)
      .subscribe(this.deploy.bind(this));
@@ -54,6 +82,16 @@ export class AppComponent {
     }
     this.http.put(this.URL_BASE, {task: this.selection.task_id})
       .subscribe(this.deploy.bind(this));
+  }
+
+  onClickEdit(): void {
+    this.editMode = true;
+  }
+
+  onClickSave(): void {
+    this.http.put(this.URL_UPDATE, {task: this.selection})
+      .subscribe(this.deploy.bind(this));
+    this.editMode = false;
   }
 
 }

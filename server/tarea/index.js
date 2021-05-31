@@ -26,7 +26,7 @@ function getCreate(parameters) {
 }
 
 function prepareDatabase() {
-    console.log('prepareDatabase', prepareDatabasePromise);
+//    console.log('prepareDatabase', prepareDatabasePromise);
     return prepareDatabasePromise = prepareDatabasePromise || database.exec(`
         CREATE TABLE IF NOT EXISTS ${tableName}
         (
@@ -46,8 +46,16 @@ function put(data) {
         .then(queryTasks);
 }
 
+function putUpdate(task) {
+    console.log('putUpdate', task);
+
+    return prepareDatabase()
+        .then(updateTask.bind(this, task))
+        .then(queryTasks);
+}
+
 function queryTasks(all) {
-    console.log('queryTasks');
+//    console.log('queryTasks');
     return database.all(`
         SELECT task_id, text, date(coalesce(done_on, '1970-01-01'), lasts || ' days') AS due, lasts
         FROM ${tableName}
@@ -57,7 +65,22 @@ function queryTasks(all) {
 
 function markTaskDone(taskId) {
     console.log('markTaskDone', taskId);
-    return database.exec(`UPDATE ${tableName} SET done_on = date('now') WHERE task_id = ${taskId}`);
+    return database.run(
+      `UPDATE ${tableName} SET done_on = date('now') WHERE task_id = ?`,
+      taskId
+    );
+}
+
+function updateTask(task) {
+    console.log('updateTask', task);
+    return database.run(
+      `UPDATE ${tableName} SET text = ?, lasts = ?, done_on = date(?, '-' || ? || ' days') WHERE task_id = ?`,
+      task.text,
+      task.lasts,
+      task.due,
+      task.lasts,
+      task.task_id
+    );
 }
 
 open({
@@ -74,7 +97,10 @@ open({
         },
         getCreate,
         put: (putEvent) => {
-            return put(JSON.parse(putEvent.postData));
-        }
+            return put(JSON.parse(putEvent));
+        },
+        putUpdate: (postData) => {
+            return putUpdate(JSON.parse(postData).task);
+        },
     });
 });
