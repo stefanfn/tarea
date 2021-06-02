@@ -28,25 +28,27 @@
   <input id="allTasks" type="checkbox" (change)="onChangeAllTasks()">
   <br/>
   <span *ngIf="loadedAufgaben.length > 0">
-    <app-aufgaben [aufgaben]="loadedAufgaben" (select)="onAufgabeSelect($event)"></app-aufgaben>&nbsp;
+    <select [(ngModel)]="selectedTaskId" (change)="onChangeSelectedTask()">
+      <option *ngFor="let task of loadedAufgaben" [value]="task.task_id">{{task.text}}</option>
+    </select>&nbsp;
     <span *ngIf="!editMode">
-      <span *ngIf="selection" class="text">
-        Fällig am {{selection && selection.due}} und dann alle {{selection && selection.lasts || '-'}} Tage.
+      <span *ngIf="selectedTask" class="text">
+        Fällig am {{selectedTask && selectedTask.due}} und dann alle {{selectedTask && selectedTask.lasts || '-'}} Tage.
       </span>
       <br/>
       <button type="button" (click)="onClickEdit()">Bearbeiten</button>
     </span><br/>
     <span class="editor" *ngIf="editMode">
-      <span *ngIf="selection">
+      <span *ngIf="selectedTask">
         <span class="label">Aufgabe</span>
-        <input class="tasktext" type="text" [value]="selection.text" (change)="onChangeText($event.target)"><br/>
+        <input class="tasktext" type="text" [value]="selectedTask.text" (change)="onChangeText($event.target)"><br/>
         <span class="label">Fälligkeit</span>
-        <input class="taskdate" type="date" [value]="selection.due" (change)="onChangeDue($event.target)"><br/>
+        <input class="taskdate" type="date" [value]="selectedTask.due" (change)="onChangeDue($event.target)"><br/>
         <span class="label">Intervall</span>
         <input
           class="tasklasts"
           type="number"
-          [value]="selection.lasts"
+          [value]="selectedTask && selectedTask.lasts || 0"
           (change)="onChangeLasts($event.target)"
         >
         <span class="label">&nbsp;Tage.</span>

@@ -15,56 +15,74 @@ export class AppComponent {
   readonly URL_CREATE = this.URL_BASE + 'create';
   readonly URL_UPDATE = this.URL_BASE + 'update';
 
+  readonly EMPTY_TASK = {task_id: 0, text: '', lasts: 0, due: ''};
+
   loadedAufgaben: Array<task> = [];
 
-  selection: task | null = null;
+  selectedTask: task = this.EMPTY_TASK;
 
-  allTasks: boolean = false;
+  selectedTaskId: number | null = null;
+
+  private allTasks: boolean = false;
 
   editMode: boolean = false;
 
   constructor(private http: HttpClient) {}
 
-  deploy(tasks: any) {
-    this.loadedAufgaben = tasks;
-    this.selection = Array.isArray(tasks) && tasks.length > 0 ? tasks[0] : null;
+  deploy(selectedTaskId: number | null, tasks: any) {
+    this.loadedAufgaben = tasks || [];
+    this.selectedTaskId = selectedTaskId || this.loadedAufgaben[0] && this.loadedAufgaben[0].task_id;
+    this.selectedTask = this.selectedTaskId && this.findTaskById(this.selectedTaskId) || this.EMPTY_TASK;
+  }
 
+  findTaskById(taskId: number): task | null {
+    return this.loadedAufgaben.find(
+      function (aufgabe: task) {
+        return aufgabe.task_id == taskId;
+      }
+    ) || null;
   }
 
   ngOnInit(): void {
-    this.http.get(this.URL_BASE)
-      .subscribe(this.deploy.bind(this));
+    this.http.get(this.URL_BASE).subscribe(this.deploy.bind(this, null));
   }
 
-  onAufgabeSelect(selection: task | null): void {
-    this.selection = selection;
+  onAufgabeSelect(selectedTaskId: number | null): void {debugger
+    this.selectedTaskId = selectedTaskId;
+    this.selectedTask =
+      selectedTaskId && this.findTaskById(selectedTaskId) || this.EMPTY_TASK;
   }
 
   onChangeAllTasks(): void {
+    let selectedTaskId = this.selectedTaskId;
     this.allTasks = !this.allTasks;
     this.http.get(this.URL_BASE + '?all=' + (this.allTasks ? 'true' : 'false'))
-      .subscribe(this.deploy.bind(this));
+      .subscribe(this.deploy.bind(this, selectedTaskId));
   }
 
   onChangeDue(target: any): void {
-    if (!this.selection || !target.value) {
+    if (!this.selectedTask || !target.value) {
       return;
     }
-    this.selection.due = target.value;
+    this.selectedTask.due = target.value;
   }
 
   onChangeLasts(target: any): void {
-    if (!this.selection || !target.value) {
+    if (!this.selectedTask || !target.value) {
       return;
     }
-    this.selection.lasts = parseInt(target.value);
+    this.selectedTask.lasts = parseInt(target.value);
+  }
+
+  onChangeSelectedTask(): void {
+    this.selectedTask = this.selectedTaskId && this.findTaskById(this.selectedTaskId) || this.EMPTY_TASK;
   }
 
   onChangeText(target: any): void {
-    if (!this.selection || !target.value) {
+    if (!this.selectedTask || !target.value) {
       return;
     }
-    this.selection.text = target.value;
+    this.selectedTask.text = target.value;
   }
 
   onClickCancel(): void {
@@ -73,15 +91,15 @@ export class AppComponent {
 
   onClickCreate(): void {
     this.http.get(this.URL_CREATE)
-     .subscribe(this.deploy.bind(this));
+     .subscribe(this.deploy.bind(this, this.selectedTask ? this.selectedTask.task_id : null));
   }
 
   onClickDone(): void {
-    if (!this.selection) {
+    if (!this.selectedTask) {
       return;
     }
-    this.http.put(this.URL_BASE, {task: this.selection.task_id})
-      .subscribe(this.deploy.bind(this));
+    this.http.put(this.URL_BASE, {task: this.selectedTask.task_id})
+      .subscribe(this.deploy.bind(this, this.selectedTask ? this.selectedTask.task_id : null));
   }
 
   onClickEdit(): void {
@@ -89,8 +107,8 @@ export class AppComponent {
   }
 
   onClickSave(): void {
-    this.http.put(this.URL_UPDATE, {task: this.selection})
-      .subscribe(this.deploy.bind(this));
+    this.http.put(this.URL_UPDATE, {task: this.selectedTask})
+      .subscribe(this.deploy.bind(this, this.selectedTask ? this.selectedTask.task_id : null));
     this.editMode = false;
   }
 

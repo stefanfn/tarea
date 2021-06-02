@@ -53,7 +53,6 @@ function start(config) {
             parameters[key] = value;
           }
         );
-        console.log('with parameters', parameters);
 
         if ('OPTIONS' !== method && !config[functionName]) {
             console.error('unhandled request function', functionName);
