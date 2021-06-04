@@ -1,5 +1,6 @@
 #!/usr/bin/node
 
+const debug = false;
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 const httpcoolmule = require('./httpcoolmule');
@@ -17,7 +18,8 @@ function createTask() {
 }
 
 function get(all) {
-    console.log('get', all);
+    debug && console.log('get', all);
+
     return prepareDatabase().then(queryTasks.bind(this, all));
 }
 
@@ -26,7 +28,8 @@ function getCreate(parameters) {
 }
 
 function prepareDatabase() {
-//    console.log('prepareDatabase', prepareDatabasePromise);
+    debug && console.log('prepareDatabase', prepareDatabasePromise);
+
     return prepareDatabasePromise = prepareDatabasePromise || database.exec(`
         CREATE TABLE IF NOT EXISTS ${tableName}
         (
@@ -39,7 +42,7 @@ function prepareDatabase() {
 }
 
 function put(data) {
-    console.log('put', data);
+    debug && console.log('put', data);
 
     return prepareDatabase()
         .then(markTaskDone.bind(this, data.task))
@@ -47,7 +50,7 @@ function put(data) {
 }
 
 function putUpdate(task) {
-    console.log('putUpdate', task);
+    debug && console.log('putUpdate', task);
 
     return prepareDatabase()
         .then(updateTask.bind(this, task))
@@ -55,7 +58,8 @@ function putUpdate(task) {
 }
 
 function queryTasks(all) {
-//    console.log('queryTasks');
+    debug && console.log('queryTasks');
+
     return database.all(`
         SELECT task_id, text, date(coalesce(done_on, '1970-01-01'), lasts || ' days') AS due, lasts
         FROM ${tableName}
@@ -64,7 +68,8 @@ function queryTasks(all) {
 }
 
 function markTaskDone(taskId) {
-    console.log('markTaskDone', taskId);
+    debug && console.log('markTaskDone', taskId);
+
     return database.run(
       `UPDATE ${tableName} SET done_on = date('now') WHERE task_id = ?`,
       taskId
@@ -72,7 +77,8 @@ function markTaskDone(taskId) {
 }
 
 function updateTask(task) {
-    console.log('updateTask', task);
+    debug && console.log('updateTask', task);
+
     return database.run(
       `UPDATE ${tableName} SET text = ?, lasts = ?, done_on = date(?, '-' || ? || ' days') WHERE task_id = ?`,
       task.text,

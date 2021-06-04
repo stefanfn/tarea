@@ -44,7 +44,6 @@ function start(config) {
 
         console.log('incoming', method);
         let functionName = method.toLowerCase() + (path || '').split('/').map(fcUpper).join('');
-        console.log('handled by', functionName);
 
         let parameters = {};
         (paramString || '').split('&').map(
