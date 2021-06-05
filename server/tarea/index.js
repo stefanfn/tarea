@@ -96,7 +96,7 @@ open({
     database = db;
 
     httpcoolmule.start({
-        referers: ['http://localhost:4200/', 'http://localhost:42956/'],
+        referers: ['http://localhost:4200/', 'http://localhost:42956/', 'http://tarea.coolmule.de/'],
         port,
         get: (parameters) => {
             return get(parameters.all === 'true')
