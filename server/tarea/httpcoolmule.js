@@ -4,6 +4,8 @@ const
     fs = require('fs'),
     http = require('http');
 
+let origin;
+
 function onPostData(postEvent, data = '') {
     console.log('onPostData', data && data.length);
     postEvent.postData = (postEvent.postData || '') + data;
@@ -13,7 +15,7 @@ function respond(request, response, config = {}) {
     let httpCode = config.httpCode || 200;
     let headers = {
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Origin': config.origin || 'http://localhost:4200',
+        'Access-Control-Allow-Origin': origin || 'http://localhost:4200',
         'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS'
     };
     if (httpCode === 200 && config.content) {
@@ -36,6 +38,8 @@ function respond(request, response, config = {}) {
 function start(config) {
     console.log('port', config.port);
     http.createServer((request, response) => {
+        origin = config.origin;
+
         let responder = respond.bind(this, request, response);
         let fcUpper = (part) => { return part ? part[0].toUpperCase() + part.substring(1) : '' };
         let method = request.method;
