@@ -13,7 +13,7 @@ function respond(request, response, config = {}) {
     let httpCode = config.httpCode || 200;
     let headers = {
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Origin': 'http://localhost:4200',
+        'Access-Control-Allow-Origin': config.origin || 'http://localhost:4200',
         'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS'
     };
     if (httpCode === 200 && config.content) {
