@@ -49,12 +49,12 @@ function put(data) {
         .then(queryTasks);
 }
 
-function putUpdate(task) {
-    debug && console.log('putUpdate', task);
+function putUpdate(config) {
+    debug && console.log('putUpdate', config);
 
     return prepareDatabase()
-        .then(updateTask.bind(this, task))
-        .then(queryTasks);
+        .then(updateTask.bind(this, config.task))
+        .then(queryTasks.bind(this, 'true' === config.all));
 }
 
 function queryTasks(all) {
@@ -71,8 +71,7 @@ function markTaskDone(taskId) {
     debug && console.log('markTaskDone', taskId);
 
     return database.run(
-      `UPDATE ${tableName} SET done_on = date('now') WHERE task_id = ?`,
-      taskId
+      `UPDATE ${tableName} SET done_on = date('now') WHERE task_id = ?`, taskId
     );
 }
 
@@ -107,7 +106,7 @@ open({
             return put(JSON.parse(putEvent));
         },
         putUpdate: (postData) => {
-            return putUpdate(JSON.parse(postData).task);
+            return putUpdate(JSON.parse(postData));
         },
     });
 });

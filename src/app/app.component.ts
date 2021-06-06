@@ -11,7 +11,8 @@ type task = {task_id: number, text: string, lasts: number, due: string};
 export class AppComponent {
   title = 'tarea';
 
-  readonly URL_BASE = 'http://coolmule.de:42956/';
+  readonly URL_BASE = 'http://localhost:42956/';
+//   readonly URL_BASE = 'http://coolmule.de:42956/';
   readonly URL_CREATE = this.URL_BASE + 'create';
   readonly URL_UPDATE = this.URL_BASE + 'update';
 
@@ -31,8 +32,17 @@ export class AppComponent {
 
   deploy(selectedTaskId: number | null, tasks: any) {
     this.loadedAufgaben = tasks || [];
-    this.selectedTaskId = selectedTaskId || this.loadedAufgaben[0] && this.loadedAufgaben[0].task_id;
-    this.selectedTask = this.selectedTaskId && this.findTaskById(this.selectedTaskId) || this.EMPTY_TASK;
+    let task = selectedTaskId && this.findTaskById(selectedTaskId);
+    if (task) {
+      this.selectedTask = task;
+      this.selectedTaskId = this.selectedTask.task_id;
+    } else if (this.loadedAufgaben[0]) {
+      this.selectedTask = this.loadedAufgaben[0];
+      this.selectedTaskId = this.selectedTask.task_id;
+    } else {
+      this.selectedTask = this.EMPTY_TASK;
+      this.selectedTaskId = this.selectedTask.task_id;
+    }
   }
 
   findTaskById(taskId: number): task | null {
@@ -91,7 +101,8 @@ export class AppComponent {
 
   onClickCreate(): void {
     this.http.get(this.URL_CREATE)
-     .subscribe(this.deploy.bind(this, this.selectedTask ? this.selectedTask.task_id : null));
+      .subscribe(this.deploy.bind(this, this.selectedTask ? this.selectedTask.task_id : null));
+    this.editMode = true;
   }
 
   onClickDone(): void {
@@ -107,7 +118,7 @@ export class AppComponent {
   }
 
   onClickSave(): void {
-    this.http.put(this.URL_UPDATE, {task: this.selectedTask})
+    this.http.put(this.URL_UPDATE, {task: this.selectedTask, all: this.allTasks ? 'true' : 'false'})
       .subscribe(this.deploy.bind(this, this.selectedTask ? this.selectedTask.task_id : null));
     this.editMode = false;
   }
