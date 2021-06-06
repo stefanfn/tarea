@@ -23,42 +23,45 @@
 </style>
 
 <div class="content" role="main">
-  <span *ngIf="loadedAufgaben.length === 0" class="text">Nichts zu tun. Saubere Arbeit.<br/></span>
-  <label for="allTasks">Alle Aufgaben anzeigen</label>
-  <input id="allTasks" type="checkbox" (change)="onChangeAllTasks()">
-  <br/>
-  <span *ngIf="loadedAufgaben.length > 0">
-    <select [(ngModel)]="selectedTaskId" (change)="onChangeSelectedTask()">
-      <option *ngFor="let task of loadedAufgaben" [value]="task.task_id">{{task.text}}</option>
-    </select>&nbsp;
-    <span *ngIf="!editMode">
-      <span *ngIf="selectedTask" class="text">
-        Fällig am {{selectedTask && selectedTask.due}} und dann alle {{selectedTask && selectedTask.lasts || '-'}} Tage.
+  <div *ngIf="loadedAufgaben.length === 0" class="text">Nichts zu tun. Saubere Arbeit.</div>
+  <div *ngIf="loadedAufgaben.length > 0" class="text">Anstehende Aufgaben, dringendste zuerst.</div>
+  <div>
+    <label for="allTasks">Alle Aufgaben anzeigen</label>
+    <input id="allTasks" type="checkbox" (change)="onChangeAllTasks()">
+    <br/>
+    <span *ngIf="loadedAufgaben.length > 0">
+      <select [(ngModel)]="selectedTaskId" (change)="onChangeSelectedTask()">
+        <option *ngFor="let task of loadedAufgaben" [value]="task.task_id">{{task.text}}</option>
+      </select>&nbsp;
+      <span *ngIf="!editMode">
+        <span *ngIf="selectedTask" class="text">
+          Fällig am {{selectedTask && selectedTask.due}} und dann alle {{selectedTask && selectedTask.lasts || '-'}} Tage.
+        </span>
+        <br/>
+        <button type="button" (click)="onClickEdit()">Bearbeiten</button>
+      </span><br/>
+      <span class="editor" *ngIf="editMode">
+        <span *ngIf="selectedTask">
+          <span class="label">Aufgabe</span>
+          <input class="tasktext" type="text" [value]="selectedTask.text" (change)="onChangeText($event.target)"><br/>
+          <span class="label">Fälligkeit</span>
+          <input class="taskdate" type="date" [value]="selectedTask.due" (change)="onChangeDue($event.target)"><br/>
+          <span class="label">Intervall</span>
+          <input
+            class="tasklasts"
+            type="number"
+            [value]="selectedTask && selectedTask.lasts || 0"
+            (change)="onChangeLasts($event.target)"
+          >
+          <span class="label">&nbsp;Tage.</span>
+        </span>
+        <br/>
+        <button type="button" (click)="onClickSave()">Speichern</button>
+        <button type="button" (click)="onClickCancel()">Abbrechen</button><br/>
       </span>
-      <br/>
-      <button type="button" (click)="onClickEdit()">Bearbeiten</button>
-    </span><br/>
-    <span class="editor" *ngIf="editMode">
-      <span *ngIf="selectedTask">
-        <span class="label">Aufgabe</span>
-        <input class="tasktext" type="text" [value]="selectedTask.text" (change)="onChangeText($event.target)"><br/>
-        <span class="label">Fälligkeit</span>
-        <input class="taskdate" type="date" [value]="selectedTask.due" (change)="onChangeDue($event.target)"><br/>
-        <span class="label">Intervall</span>
-        <input
-          class="tasklasts"
-          type="number"
-          [value]="selectedTask && selectedTask.lasts || 0"
-          (change)="onChangeLasts($event.target)"
-        >
-        <span class="label">&nbsp;Tage.</span>
-      </span>
-      <br/>
-      <button type="button" (click)="onClickSave()">Speichern</button>
-      <button type="button" (click)="onClickCancel()">Abbrechen</button><br/>
+      <button type="button" (click)="onClickDone()">Erledigt</button><br/>
     </span>
-    <button type="button" (click)="onClickDone()">Erledigt</button><br/>
-  </span>
-  <button type="button" (click)="onClickCreate()">Neue Aufgabe</button>
+    <button type="button" (click)="onClickCreate()">Neue Aufgabe</button>
+  </div>
 
 </div>
