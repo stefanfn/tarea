@@ -11,8 +11,8 @@ type task = {task_id: number, text: string, lasts: number, due: string};
 export class AppComponent {
   title = 'tarea';
 
-  readonly URL_BASE = 'http://localhost:42956/';
-//   readonly URL_BASE = 'http://coolmule.de:42956/';
+//   readonly URL_BASE = 'http://localhost:42956/';
+  readonly URL_BASE = 'http://coolmule.de:42956/';
   readonly URL_CREATE = this.URL_BASE + 'create';
   readonly URL_UPDATE = this.URL_BASE + 'update';
 
